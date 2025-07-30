@@ -1,6 +1,6 @@
 package com.example.library_system.controllers;
 
-import com.example.library_system.controllers.dts.UserDTO;
+import com.example.library_system.controllers.dto.UserDTO;
 import com.example.library_system.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,7 +28,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<UserDTO>> getUser(@PathVariable UUID id) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable UUID id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 

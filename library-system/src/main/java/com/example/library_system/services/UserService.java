@@ -1,13 +1,13 @@
 package com.example.library_system.services;
 
-import com.example.library_system.controllers.dts.UserDTO;
+import com.example.library_system.controllers.dto.UserDTO;
 import com.example.library_system.controllers.mappers.UserMapper;
 import com.example.library_system.entities.User;
+import com.example.library_system.exceptions.custom.UserNotFoundException;
 import com.example.library_system.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,9 +26,10 @@ public class UserService {
         userRepository.save(userMapper.toEntity(dto));
     }
 
-    public Optional<UserDTO> getUserById(UUID id) {
-        var user = userRepository.findById(id);
-        return user.map(userMapper::toDTO);
+    public UserDTO getUserById(UUID id) {
+        return userRepository.findById(id)
+                .map(userMapper::toDTO)
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
     }
 
     public List<UserDTO> getAllUsers() {

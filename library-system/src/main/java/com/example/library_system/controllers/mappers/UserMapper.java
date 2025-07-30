@@ -1,6 +1,6 @@
 package com.example.library_system.controllers.mappers;
 
-import com.example.library_system.controllers.dts.UserDTO;
+import com.example.library_system.controllers.dto.UserDTO;
 import com.example.library_system.entities.User;
 import org.mapstruct.Mapper;
 
