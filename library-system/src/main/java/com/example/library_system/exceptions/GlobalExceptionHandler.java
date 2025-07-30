@@ -1,5 +1,6 @@
 package com.example.library_system.exceptions;
 
+import com.example.library_system.exceptions.custom.EmailAlreadyExistsException;
 import com.example.library_system.exceptions.custom.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,5 +24,16 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                "Email already exists",
+                HttpStatus.CONFLICT.value(),
+                List.of(ex.getMessage())
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 }

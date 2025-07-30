@@ -3,6 +3,7 @@ package com.example.library_system.services;
 import com.example.library_system.controllers.dto.UserDTO;
 import com.example.library_system.controllers.mappers.UserMapper;
 import com.example.library_system.entities.User;
+import com.example.library_system.exceptions.custom.EmailAlreadyExistsException;
 import com.example.library_system.exceptions.custom.UserNotFoundException;
 import com.example.library_system.repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,10 @@ public class UserService {
     }
 
     public void save(UserDTO dto) {
+        if(userRepository.existsByEmail(dto.email())) {
+            throw new EmailAlreadyExistsException("Email is already in use: " + dto.email());
+        }
+
         userRepository.save(userMapper.toEntity(dto));
     }
 
@@ -40,7 +45,11 @@ public class UserService {
     }
 
     public UserDTO update(UUID id, UserDTO dto) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
+
+        if(!user.getEmail().equals(dto.email()) && userRepository.existsByEmail(dto.email())) {
+            throw new EmailAlreadyExistsException("Email is already in use: " + dto.email());
+        }
 
         user.setName(dto.name());
         user.setEmail(dto.email());
