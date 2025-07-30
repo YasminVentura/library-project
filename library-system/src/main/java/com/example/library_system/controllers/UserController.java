@@ -1,12 +1,15 @@
 package com.example.library_system.controllers;
 
-import com.example.library_system.entities.User;
+import com.example.library_system.controllers.dts.UserDTO;
 import com.example.library_system.services.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -19,8 +22,30 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
+    public ResponseEntity<UserDTO> register(@Valid @RequestBody UserDTO user) {
         userService.save(user);
-        return ResponseEntity.ok().body(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<UserDTO>> getUser(@PathVariable UUID id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/allUsers")
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable UUID id, @Valid @RequestBody UserDTO dto) {
+        return ResponseEntity.ok(userService.update(id, dto));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable UUID id) {
+        userService.delete(id);
+        return ResponseEntity.notFound().build();
+    }
+
 }
