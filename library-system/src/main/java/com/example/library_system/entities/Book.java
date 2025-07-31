@@ -17,6 +17,8 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Column(unique = true, nullable = false, length = 20)
+    private String isbn;
     @Column(nullable = false, length = 120)
     private String title;
     @Column(length = 120, nullable = false)
@@ -36,7 +38,8 @@ public class Book {
 
     public Book() {}
 
-    public Book(String title, String author, String publisher, Integer publicationYear) {
+    public Book(String isbn,String title, String author, String publisher, Integer publicationYear) {
+        this.isbn = isbn;
         this.title = title;
         this.author = author;
         this.publisher = publisher;
@@ -45,6 +48,14 @@ public class Book {
 
     public UUID getId() {
         return id;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
     }
 
     public String getTitle() {

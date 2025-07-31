@@ -4,8 +4,12 @@ import com.example.library_system.controllers.dto.BookDTO;
 import com.example.library_system.controllers.mappers.BookMapper;
 import com.example.library_system.entities.Book;
 import com.example.library_system.entities.enums.BookStatus;
+import com.example.library_system.exceptions.custom.BookNotFoundException;
+import com.example.library_system.exceptions.custom.IsbnAlreadyExistsException;
 import com.example.library_system.repositories.BookRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class BookService {
@@ -19,8 +23,18 @@ public class BookService {
     }
 
     public void save(BookDTO dto) {
+        if(bookRepository.existsByIsbn(dto.isbn())) {
+            throw new IsbnAlreadyExistsException("Isbn is already in use: " + dto.isbn());
+        }
+
         Book book = bookMapper.toEntity(dto);
         book.setStatus(BookStatus.AVAILABLE);
         bookRepository.save(book);
+    }
+
+    public BookDTO getBookById(UUID id) {
+        return bookRepository.findById(id)
+                .map(bookMapper::toDTO)
+                .orElseThrow(() -> new BookNotFoundException("Book not found with ID: " + id));
     }
 }
