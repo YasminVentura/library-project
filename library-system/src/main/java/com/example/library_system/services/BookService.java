@@ -9,7 +9,9 @@ import com.example.library_system.exceptions.custom.IsbnAlreadyExistsException;
 import com.example.library_system.repositories.BookRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -36,5 +38,32 @@ public class BookService {
         return bookRepository.findById(id)
                 .map(bookMapper::toDTO)
                 .orElseThrow(() -> new BookNotFoundException("Book not found with ID: " + id));
+    }
+    public List<BookDTO> getAllBooks() {
+        return  bookRepository.findAll()
+                .stream()
+                .map(bookMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public BookDTO update(UUID id, BookDTO dto) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException("Book not found with ID: " + id));
+
+        if(!book.getIsbn().equals(dto.isbn()) && bookRepository.existsByIsbn(dto.isbn())) {
+            throw new IsbnAlreadyExistsException("Isbn is already in use: " + dto.isbn());
+        }
+
+        book.setIsbn(dto.isbn());
+        book.setTitle(dto.title());
+        book.setAuthor(dto.author());
+        book.setPublisher(dto.publisher());
+        book.setPublicationYear(dto.publicationYear());
+
+        return bookMapper.toDTO(bookRepository.save(book));
+    }
+
+    public void delete(UUID id) {
+        bookRepository.deleteById(id);
     }
 }
