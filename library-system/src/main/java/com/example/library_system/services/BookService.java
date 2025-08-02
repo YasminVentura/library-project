@@ -7,11 +7,17 @@ import com.example.library_system.entities.enums.BookStatus;
 import com.example.library_system.exceptions.custom.BookNotFoundException;
 import com.example.library_system.exceptions.custom.IsbnAlreadyExistsException;
 import com.example.library_system.repositories.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.example.library_system.repositories.specs.BookSpecs.*;
 
 @Service
 public class BookService {
@@ -66,4 +72,31 @@ public class BookService {
     public void delete(UUID id) {
         bookRepository.deleteById(id);
     }
+
+    public Page<BookDTO> search(String isbn, String title, String author, String publisher,
+                                BookStatus status, Integer page, Integer sizePage) {
+        Specification<Book> spec = (root, query, cb) -> cb.conjunction();
+
+        if (isbn != null) {
+            spec = spec.and(hasIsbn(isbn));
+        }
+        if (title != null) {
+            spec = spec.and(hasTitle(title));
+        }
+        if (author != null) {
+            spec = spec.and(hasAuthor(author));
+        }
+        if (publisher != null) {
+            spec = spec.and(hasPublisher(publisher));
+        }
+        if (status != null) {
+            spec = spec.and(hasStatus(status));
+        }
+
+        Pageable pageRequest = PageRequest.of(page, sizePage);
+
+        var books = bookRepository.findAll(spec, pageRequest);
+        return books.map(bookMapper::toDTO);
+    }
+
 }

@@ -1,8 +1,11 @@
 package com.example.library_system.controllers;
 
 import com.example.library_system.controllers.dto.BookDTO;
+import com.example.library_system.entities.enums.BookStatus;
 import com.example.library_system.services.BookService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +48,20 @@ public class BookController {
     public ResponseEntity<?> delete(@PathVariable UUID id) {
         bookService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<BookDTO>> search(
+            @RequestParam (value = "isbn", required = false) String isbn,
+            @RequestParam (value = "title",  required = false) String title,
+            @RequestParam (value = "author", required = false) String author,
+            @RequestParam (value = "publisher", required = false) String publisher,
+            @RequestParam(value = "status", required = false) BookStatus status,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(name="sizePage", defaultValue = "20") Integer sizePage
+    ) {
+        return  ResponseEntity.ok(bookService
+                    .search(isbn, title, author, publisher, status, page, sizePage));
     }
 
 }
