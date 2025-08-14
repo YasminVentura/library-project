@@ -1,9 +1,6 @@
 package com.example.library_system.exceptions;
 
-import com.example.library_system.exceptions.custom.BookNotFoundException;
-import com.example.library_system.exceptions.custom.EmailAlreadyExistsException;
-import com.example.library_system.exceptions.custom.IsbnAlreadyExistsException;
-import com.example.library_system.exceptions.custom.UserNotFoundException;
+import com.example.library_system.exceptions.custom.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -58,6 +55,17 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
                 "Isbn in use",
+                HttpStatus.CONFLICT.value(),
+                List.of(ex.getMessage())
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BookUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleBookUnavailableException(BookUnavailableException ex) {
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                "Book unavailable",
                 HttpStatus.CONFLICT.value(),
                 List.of(ex.getMessage())
         );

@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -29,8 +30,11 @@ public class Book {
     @Column(nullable = false, length = 4)
     private Integer publicationYear;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(name = "status",nullable = false, length = 10)
     private BookStatus status;
+
+    @OneToMany(mappedBy = "book")
+    private List<Loan> loans;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -97,6 +101,14 @@ public class Book {
 
     public void setStatus(BookStatus status) {
         this.status = status;
+    }
+
+    public List<Loan> getLoans() {
+        return loans;
+    }
+
+    public void setLoans(List<Loan> loans) {
+        this.loans = loans;
     }
 
     @Override
